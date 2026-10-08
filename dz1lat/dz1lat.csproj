@@ -43,9 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="enums\task4.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="structenums\enum.cs" />
+    <Compile Include="structenums\structure2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

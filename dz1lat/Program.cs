@@ -1,173 +1,186 @@
 ﻿using System;
-using dz1lat.enums;
+using System.Threading;
+using dz1lat.structenums;
 namespace dz1lat
 {
     internal class Program
     {
-        static string GetDrinkByProfession(string profession)
-        {
-            string normalizedInput = profession == null ? null : profession.Trim().ToLower();
 
-            switch (normalizedInput)
+        static bool SwapElements(int[] array, int value1, int value2)
+        {
+            int index1 = Array.IndexOf(array, value1);
+            int index2 = Array.IndexOf(array, value2);
+
+            if (index1 == -1 || index2 == -1)
             {
-                case "jabroni":
-                    return "Patron Tequila";
-                case "school counselor":
-                    return "Anything with Alcohol";
-                case "programmer":
-                    return "Hipster Craft Beer";
-                case "bike gang member":
-                    return "Moonshine";
-                case "politician":
-                    return "Your tax dollars";
-                case "rapper":
-                    return "Cristal";
-                default:
-                    return "Beer";
+                return false;
+            }
+            int temp = array[index1];
+            array[index1] = array[index2];
+            array[index2] = temp;
+
+            return true; 
+        }
+        static long CalculateArrayStats(out double avg, ref long prod, params int[] array)
+        {
+            if (array == null || array.Length == 0)
+            {
+                avg = 0;
+                prod = 0;
+                return 0;
+            }
+
+            long sum = 0;
+            foreach (int number in array)
+            {
+                sum += number;
+                prod *= number;
+            }
+            avg = (double)sum / array.Length;
+
+            return sum;
+        }
+        static readonly string[][] DigitPatterns = new string[][]
+        {
+        new string[] { "###", "# #", "# #", "# #", "###" }, 
+        new string[] { "  #", "  #", "  #", "  #", "  #" }, 
+        new string[] { "###", "  #", "###", "#  ", "###" }, 
+        new string[] { "###", "  #", "###", "  #", "###" }, 
+        new string[] { "# #", "# #", "###", "  #", "  #" }, 
+        new string[] { "###", "#  ", "###", "  #", "###" }, 
+        new string[] { "###", "#  ", "###", "# #", "###" }, 
+        new string[] { "###", "  #", "  #", "  #", "  #" }, 
+        new string[] { "###", "# #", "###", "# #", "###" }, 
+        new string[] { "###", "# #", "###", "  #", "###" }  
+        };
+        static void DrawDigit(int digit)
+        {
+            string[] rows = DigitPatterns[digit];
+            foreach (string row in rows)
+            {
+                Console.WriteLine(row);
             }
         }
-
+        static void ShowRedError(string errorMessage)
+        {
+            ConsoleColor originalBackground = Console.BackgroundColor;
+            ConsoleColor originalForeground = Console.ForegroundColor;
+            Console.BackgroundColor = ConsoleColor.Red;
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Clear(); 
+            Console.WriteLine("\n" + errorMessage);
+            Console.WriteLine("Консоль восстановится через 3 секунды...");
+            Thread.Sleep(3000);
+            Console.BackgroundColor = originalBackground;
+            Console.ForegroundColor = originalForeground;
+            Console.Clear();
+        }
         static void Main(string[] args)
+        {
+            Console.WriteLine("Задание 5.1");
+            int[] numbers = new int[20];
+            Random random = new Random();
+
+            for (int i = 0; i < numbers.Length; i++)
             {
-            Console.WriteLine("Задание 1");
-            int[] numbers = new int[10];
-            Console.WriteLine("Введите 10 целых чисел по очереди:");
-            for (int i = 0; i < 10; i++)
-            {
-                Console.Write($"Число {i + 1}: ");
-                numbers[i] = Convert.ToInt32(Console.ReadLine());
+                numbers[i] = random.Next(1, 100);
             }
-            bool isSorted = true;
-            int errorIndex = -1;
-            for (int i = 1; i < numbers.Length; i++)
+
+            Console.WriteLine("Исходный массив:");
+            Console.WriteLine(string.Join(" ", numbers));
+            Console.WriteLine();
+            Console.Write("Введите первое число из массива(по умолчанию 0): ");
+            bool isfirstNumber = int.TryParse(Console.ReadLine(), out int firstNumber);
+            Console.Write("Введите второе число из массива: ");
+            bool issecondNumber = int.TryParse(Console.ReadLine(), out int secondNumber);
+
+            bool success = SwapElements(numbers, firstNumber, secondNumber);
+            if (success)
             {
-                if (numbers[i] <= numbers[i - 1])
+                Console.WriteLine("Получившийся массив:");
+                Console.WriteLine(string.Join(" ", numbers));
+            }
+            else
+            {
+                Console.WriteLine("Ошибка: Одно или оба числа не найдены в массиве!");
+            }
+            Console.ReadKey();
+
+            Console.WriteLine("Задание 5.2\nВведите размер массива(по умолчанию 0): ");
+            bool issize = int.TryParse(Console.ReadLine(), out int size);
+            int[] userArray = new int[size];
+
+            for (int i = 0; i < userArray.Length; i++)
+            {
+                Console.Write($"Введите элемент [{i}]: ");
+                userArray[i] = int.Parse(Console.ReadLine());
+            }
+            long product = 1;
+            double average;
+            long sum = CalculateArrayStats(out average, ref product, userArray);
+            Console.WriteLine($"Сумма элементов: {sum}\nПроизведение элементов: {product}\nСреднее арифметическое: {average:F2}");
+            Console.ReadKey();
+
+            Console.WriteLine("Задание 5.3");
+            while (true)
+            {
+                Console.Write("Введите ввод (число, exit или закрыть): ");
+                string input = Console.ReadLine()?.Trim();
+                string lowerInput = input.ToLower();
+
+                if (lowerInput == "exit" || lowerInput == "закрыть")
                 {
-                    isSorted = false;
-                    errorIndex = i + 1;
                     break;
                 }
-            }
-            if (isSorted)
-            {
-                Console.WriteLine("Последовательность упорядочена по возрастанию.");
-            }
-            else
-            {
-                Console.WriteLine($"Последовательность НЕ упорядочена по возрастанию.\nПорядковый номер первого неподошедшего числа: {errorIndex}");
+
+                if (!int.TryParse(input, out int number))
+                {
+                    throw new FormatException("Критическая ошибка: введённое значение не является целым числом!");
+                }
+
+                if (number >= 0 && number <= 9)
+                {
+                    Console.WriteLine($"\nРисунок цифры {number}:");
+                    DrawDigit(number);
+                    Console.WriteLine();
+                }
+
+                else
+                {
+                    ShowRedError($"Ошибка: Число {number} вне диапазона от 0 до 9!");
+                }
+
             }
             Console.ReadKey();
 
-            Console.WriteLine("Задание 2\nВведите порядковый номер карты k (6 <= k <= 14): ");
-            try
-            {
-                int k = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("Задание 5.4");
+            Grandpa[] grandpas = new Grandpa[5];
+            grandpas[0] = new Grandpa("Иваныч", GrumpinessLevel.Низкий, new string[]
+                { "Эх, молодежь...", "Раньше было лучше!" }); 
+            grandpas[1] = new Grandpa("Петрович", GrumpinessLevel.Средний, new string[]
+                { "Цены опять выросли!", "Проститутки у подъезда!", "Гады разворовали страну!" }); 
+            grandpas[2] = new Grandpa("Михалыч", GrumpinessLevel.Высокий, new string[]
+                { "Понаехали тут!", "Телевизор один бред кажет!", "Гребаная погода!" }); 
 
-                if (k < 6 || k > 14)
-                {
-                    throw new ArgumentOutOfRangeException();
-                }
-                string cardName;
-                switch (k)
-                {
-                    case 6: cardName = "Шестерка"; break;
-                    case 7: cardName = "Семерка"; break;
-                    case 8: cardName = "Восьмерка"; break;
-                    case 9: cardName = "Девятка"; break;
-                    case 10: cardName = "Десятка"; break;
-                    case 11: cardName = "Валет"; break;
-                    case 12: cardName = "Дама"; break;
-                    case 13: cardName = "Король"; break;
-                    case 14: cardName = "Туз"; break;
-                    default: cardName = "Такой карты нет"; break;
-                }
+            grandpas[3] = new Grandpa("Савельич", GrumpinessLevel.Экстремальный, new string[]
+                { "Капиталисты проклятые!", "Ворюги кругом!", "Хватит шуметь!", "Тьфу на вас!", "Дерьмо ходячее!" }); 
 
-                Console.WriteLine($"Достоинство карты: {cardName}");
-            }
-            catch (FormatException)
+            grandpas[4] = new Grandpa("Никитич", GrumpinessLevel.Высокий, new string[]
+                { "Что за мода пошла?", "Тьфу!" }); 
+            string[] swearList = { "проститутки", "гады", "гребаная", "дерьмо" };
+            Grandpa referee = grandpas[0];
+            for (int i = 0; i < grandpas.Length; i++)
             {
-                Console.WriteLine("Ошибка: Введено не число.");
-            }
-            catch (ArgumentOutOfRangeException)
-            {
-                Console.WriteLine("Ошибка: Число вне диапазона от 6 до 14.");
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("Произошла непредвиденная ошибка.");
-            }
-            finally
-            {
-                Console.WriteLine("Карта была определена.");
+                int earnedBruises = referee.CheckSwearWords(grandpas[i], swearList);
+                grandpas[i].BruisesCount += earnedBruises;
+                Console.WriteLine($"Дед: {grandpas[i].Name}\nУровень ворчливости: {grandpas[i].Grumpiness}\nКоличество фраз: {grandpas[i].GrumblePhrases.Length}\nПолучено фингалов от бабки за маты: {earnedBruises}\nВсего синяков теперь: {grandpas[i].BruisesCount}");
+                Console.WriteLine(new string('-', 35));
             }
 
-            Console.WriteLine("Задание 3\nВведите тип личности:");
-            string input = Console.ReadLine();
-
-            string output = GetDrinkByProfession(input);
-
-            Console.WriteLine($"Подать ему: {output}");
             Console.ReadKey();
-
-            Console.WriteLine("Задание 4\nВведите порядковые номер дня недели");
-            int number = Convert.ToInt32(Console.ReadLine());
-            if (number < 1 || number > 7)
-            {
-                Console.WriteLine("Ошибка: Номер должен быть от 1 до 7.");
-            }
-            else
-            {
-                DaysOfWeek day = (DaysOfWeek)number;
-
-                switch (day)
-                {
-                    case DaysOfWeek.Понедельник:
-                        Console.WriteLine("Это Понедельник");
-                        break;
-                    case DaysOfWeek.Вторник:
-                        Console.WriteLine("Это Вторник");
-                        break;
-                    case DaysOfWeek.Среда:
-                        Console.WriteLine("Это Среда");
-                        break;
-                    case DaysOfWeek.Четверг:
-                        Console.WriteLine("Это Четверг");
-                        break;
-                    case DaysOfWeek.Пятница:
-                        Console.WriteLine("Это Пятница");
-                        break;
-                    case DaysOfWeek.Суббота:
-                        Console.WriteLine("Это Суббота");
-                        break;
-                    case DaysOfWeek.Воскресенье:
-                        Console.WriteLine("Это Воскресенье");
-                        break;
-                }
-            }
-            Console.ReadKey();
-
-            Console.WriteLine("Задание 5\nВведите количество элементов: ");
-            int n = Convert.ToInt32(Console.ReadLine());
-            string[] dolls = new string[n];
-            for (int i = 0; i < n; i++)
-            {
-                Console.Write($"Введите название предмета номер {i + 1}: ");
-                dolls[i] = Console.ReadLine();
-            }
-            int bag=0;
-            foreach (string doll in dolls)
-            {
-                if (doll == "Hello Kitty" || doll == "Barbie doll")
-                {
-                    bag++;
-                }
-            }
-            Console.WriteLine($"В сумке кукол: {bag}");
         }
-
-        }
-
     }
+}
 
 
         
